@@ -61,15 +61,7 @@ salto_altura_maxima2 = 250
 en_suelo2 = True
 caminando2 = False
 
-# colisiones
-limite_sprite1_der = posicion_x1 + 120
-limite_sprite1_izq = posicion_x1 - 120
-limite_sprite2_izq = posicion_x2 - 120
-limite_sprite2_der = posicion_x2 + 120
-colisionando1_der = (posicion_x1 == limite_sprite2_izq)
-colisionando1_izq = (posicion_x1 == limite_sprite2_der)
-colisionando2_der = (posicion_x2 == limite_sprite1_der)
-colisionando2_izq = (posicion_x2 == limite_sprite1_izq)
+
 # Variables de control para las acciones del jugador 1
 salto1 = False
 golpe1 = False
@@ -79,16 +71,6 @@ tiempo = pygame.time.get_ticks
 tomar_ms = 200
 
 
-caminar1a_derecha = pygame.image.load("E:\\Visual Studio WorkSpace\\Juego nashe\\caminar1der.png")
-caminar1a_derecha = pygame.transform.scale(caminar1a_derecha, (120, 150))
-caminar1b_derecha = pygame.image.load("caminar2der.png")
-caminar1b_derecha = pygame.transform.scale(caminar1b_derecha, (120, 150))
-
-
-caminar2_derecha = pygame.image.load("E:\\Visual Studio WorkSpace\\Juego nashe\\caminar2der.png")
-caminar2_derecha = pygame.transform.scale(caminar2_derecha, (120, 150))
-
-sprites_caminar1 = [caminar1a_derecha, caminar1b_derecha]
 
 def SpriteSalto(personaje, sprite_path):
     personaje = pygame.image.load(sprite_path)
@@ -121,9 +103,6 @@ contador = 0
 
 
 
-
-
-
 # Número máximo de golpes antes de perder
 max_golpes = 11
 
@@ -131,11 +110,31 @@ max_golpes = 11
 golpes_jugador1 = 1
 golpes_jugador2 = 1
 
+def manejar_colisiones():
+    global posicion_x1, posicion_x2
 
-zona_golpe_jugador1 = pygame.Rect(posicion_x1, posicion_y1, 120, 150)
-zona_golpe_jugador2 = pygame.Rect(posicion_x2, posicion_y2, 120, 150)
+    # Obtener los rectángulos de colisión de los personajes
+    rect_jugador1 = pygame.Rect(posicion_x1, posicion_y1, 120, 150)
+    rect_jugador2 = pygame.Rect(posicion_x2, posicion_y2, 120, 150)
 
+    # Verificar si los rectángulos de colisión se superponen
+    if rect_jugador1.colliderect(rect_jugador2):
+        # Colisión detectada, ajustar las posiciones de los personajes
+        distancia = 30
+        # Ajustar posición del jugador 1
+        if posicion_x1 < posicion_x2:
+            posicion_x1 -= distancia // 2
+        else:
+            posicion_x1 += distancia // 2
 
+        # Ajustar posición del jugador 2
+        if posicion_x2 < posicion_x1:
+            posicion_x2 -= distancia // 2
+        else:
+            posicion_x2 += distancia // 2
+
+        # Actualizar la pantalla para reflejar los cambios
+        pygame.display.flip()
 
 #Interfaz de Usuario
 while True:
@@ -188,8 +187,7 @@ while True:
             posicion_x1 = 0
         if not salto1:
             salto_velocidad1 = 10
-            runner = cargar_animacion("caminar", "der_atras.png", 6)
-            mostrar_animacion(runner, 5, posicion_x1, posicion_y1)
+
             
     if keys[pygame.K_d] and not colisionando1_der:
         posicion_x1 += velocidad_x1
@@ -198,8 +196,6 @@ while True:
             posicion_x1 = 1250
         if not salto1:
             salto_velocidad2 = 10
-            runner = cargar_animacion("caminar", "der.png", 6 )
-            mostrar_animacion(runner, 5, posicion_x1, posicion_y1)
 
      # Movimiento horizontal para el jugador 2
     caminando2 = False
@@ -208,17 +204,11 @@ while True:
         caminando2 = True
         if posicion_x2 < 0:
            posicion_x2 = 0
-        if not salto2:
-            runner2 = cargar_animacion("caminar", "izq.png", 6)
-            mostrar_animacion(runner2, 5, posicion_x2, posicion_y2)
     if keys[pygame.K_RIGHT] and not colisionando2_izq:
         caminando2 = True
         posicion_x2 += velocidad_x2
         if posicion_x2 > 1250:
            posicion_x2 = 1250
-        if not salto2:
-            runner2 = cargar_animacion("caminar", "izq_atras.png", 6)
-            mostrar_animacion(runner2, 5, posicion_x2, posicion_y2)
     # Salto para el jugador 1
     if salto1:
 
@@ -250,13 +240,10 @@ while True:
 
 
     # Durante el bucle del juego, verifica si las zonas de golpe se superponen
-    if zona_golpe_jugador1.colliderect(zona_golpe_jugador2):
-        # Aquí puedes realizar las acciones correspondientes al golpe, como reducir la salud del jugador golpeado
-        if keys[pygame.K_w]:
-            contador +=1
-            barras[contador]
-          # Reducir la salud del jugador 2 en este ejemplo
 
+    manejar_colisiones()
+    runner = cargar_animacion("caminar", "der.png", 6)
+    runner2 = cargar_animacion("caminar", "der.png", 6)
     
 
     if posicion_y1 <= posicion_y2 or posicion_y2 <= posicion_y1:
@@ -283,26 +270,51 @@ while True:
         colisionando2_izq = False
     
    
-    runner2 = cargar_animacion("caminar", "izq.png", 6)
-    runner = cargar_animacion("caminar", "der.png", 6)
+   
     # Dibujar elementos en pantalla
     screen.blit(imagen_figura, (0, 0))
-    screen.blit(barras[contador], (400, 200))
-    if not caminando and not salto1:
-        screen.blit(personaje_sprite1, (posicion_x1, posicion_y1))
-    else:
-        if keys[pygame.K_d] and not salto1:
-            mostrar_animacion(runner, 5, posicion_x1, posicion_y1)
-        else: mostrar_animacion(runner, 5, posicion_x1, posicion_y1)
+   
     
     if not caminando2 and not salto2:
         screen.blit(personaje_sprite2, (posicion_x2, posicion_y2))
     else: 
-        if keys[pygame.K_RIGHT] and not salto2:
-            runner2 = cargar_animacion("caminar", "izq.png", 6)
-            mostrar_animacion(runner2, 5, posicion_x2, posicion_y2)
-        else: mostrar_animacion(runner2, 5, posicion_x2, posicion_y2)
+        if posicion_x1 < posicion_x2:
+            if keys[pygame.K_LEFT] and not salto2:
+                runner2 = cargar_animacion("caminar", "izq.png", 6)
+                mostrar_animacion(runner2, 5, posicion_x2, posicion_y2)
+            if keys[pygame.K_RIGHT] and not salto2:
+                runner2 = cargar_animacion("caminar", "der.png", 6)
+                mostrar_animacion(runner2, 5, posicion_x2, posicion_y2)
+        else: 
+            if keys[pygame.K_LEFT] and not salto2:
+                runner2 = cargar_animacion("caminar", "izq.png", 6)
+                mostrar_animacion(runner2, 5, posicion_x2, posicion_y2)
+            if keys[pygame.K_RIGHT] and not salto2:
+                runner2 = cargar_animacion("caminar", "der.png", 6)
+                mostrar_animacion(runner2, 5, posicion_x2, posicion_y2)
 
+
+
+    if not caminando and not salto1:
+        screen.blit(personaje_sprite1, (posicion_x1, posicion_y1))
+    else: 
+        if posicion_x2 > posicion_x1:
+            if keys[pygame.K_a] and not salto1:
+                runner = cargar_animacion("caminar", "izq.png", 6)
+                mostrar_animacion(runner, 5, posicion_x1, posicion_y1)
+            if keys[pygame.K_d] and not salto1:
+                runner = cargar_animacion("caminar", "der.png", 6)
+                mostrar_animacion(runner, 5, posicion_x1, posicion_y1)
+        else:
+            if posicion_x2 < posicion_x1: 
+                if keys[pygame.K_d] and not salto1:
+                    runner = cargar_animacion("caminar", "izq.png", 6)
+                    mostrar_animacion(runner, 5, posicion_x1, posicion_y1)
+                if keys[pygame.K_a] and not salto1:
+                    runner = cargar_animacion("caminar", "der.png", 6)
+                    mostrar_animacion(runner, 5, posicion_x1, posicion_y1)
+            
+        
     #direccion personaje 1
 
     #direccion de vista
