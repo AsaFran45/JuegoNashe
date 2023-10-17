@@ -43,6 +43,12 @@ jugador1_stand = pygame.transform.scale(jugador1_stand, (120, 150))
 jugador2_stand = pygame.image.load("6der2.png")
 jugador2_stand = pygame.transform.scale(jugador2_stand, (120, 150))
 
+sprite_salto_der = pygame.image.load("jumpder2.png")
+sprite_salto_der = pygame.transform.scale(sprite_salto_der, (120, 150))
+
+sprite_salto_izq = pygame.image.load("jumpizq2.png")
+sprite_salto_izq = pygame.transform.scale(sprite_salto_izq, (120, 150))
+
 # Variables para el movimiento del jugador 1
 posicion_x1 = 30
 posicion_y1 = 400
@@ -72,8 +78,8 @@ tomar_ms = 200
 
 
 
-def SpriteSalto(personaje, sprite_path):
-    personaje = pygame.image.load(sprite_path)
+
+
 
 
 # Variables de control para las acciones del jugador 2
@@ -211,8 +217,7 @@ while True:
            posicion_x2 = 1250
     # Salto para el jugador 1
     if salto1:
-
-        if posicion_y1 > (400 - salto_altura_maxima1):
+        if posicion_y1 > (400 - salto_altura_maxima2):
             posicion_y1 -= salto_velocidad1
         else:
             salto1 = False
@@ -313,33 +318,36 @@ while True:
                 if keys[pygame.K_a] and not salto1:
                     runner = cargar_animacion("caminar", "der.png", 6)
                     mostrar_animacion(runner, 5, posicion_x1, posicion_y1)
-            
         
-    #direccion personaje 1
 
     #direccion de vista
     if posicion_x1 > posicion_x2:
         jugador1_stand = pygame.image.load("6izq2.png")
         jugador1_stand = pygame.transform.scale(jugador1_stand, (120, 150))
-        if salto1 is True:
-            SpriteSalto(personaje_sprite1, "jumpizq2.png")
 
-        #Direccion de salto
-        if salto1 is True:
-            personaje_sprite1 = pygame.image.load("jumpizq2.png")
-            personaje_sprite1 = pygame.transform.scale(personaje_sprite1, (120, 150))
         #Direccion de golpe
         if golpe1 is True:
             personaje_sprite1 = pygame.image.load("golpe2.png")
             personaje_sprite1 = pygame.transform.scale(personaje_sprite1, (160, 150))
+            
     else:
         ##direccion derecha
         jugador1_stand = pygame.image.load("6der2.png")
         jugador1_stand = pygame.transform.scale(jugador1_stand, (120, 150))
         #direccion salto derecha
         if salto1 is True:
-            personaje_sprite1 = pygame.image.load("jumpder2.png")
-            personaje_sprite1 = pygame.transform.scale(personaje_sprite1, (120, 150))
+            if posicion_x1 < posicion_x2:
+                personaje_sprite1 = sprite_salto_der
+            if posicion_x1 > posicion_x2:
+                personaje_sprite1 = sprite_salto_izq
+            screen.blit(personaje_sprite1, (posicion_x1, posicion_y1))
+        if salto2 is True:
+            if posicion_x1 < posicion_x2:
+                personaje_sprite2 = sprite_salto_izq
+            if posicion_x1 > posicion_x2:
+                personaje_sprite2 = sprite_salto_der
+
+            screen.blit(personaje_sprite2, (posicion_x2, posicion_y2))
         #direccion golpe derecha
         if golpe1 is True:
             personaje_sprite1 = pygame.image.load("golpe.png")
@@ -350,8 +358,7 @@ while True:
         jugador2_stand = pygame.image.load("6izq2.png")
         jugador2_stand = pygame.transform.scale(jugador2_stand, (120, 150))
         if salto2 is True:
-            personaje_sprite2 = pygame.image.load("jumpizq2.png")
-            personaje_sprite2 = pygame.transform.scale(personaje_sprite2, (120, 150))
+            pass
         if golpe2 is True:
             personaje_sprite2 = pygame.image.load("golpe2.png")
             personaje_sprite2 = pygame.transform.scale(personaje_sprite2, (160, 150))
@@ -359,15 +366,9 @@ while True:
         jugador2_stand = pygame.image.load("6der2.png")
         jugador2_stand = pygame.transform.scale(jugador2_stand, (120, 150))
         if salto2 is True:
-            personaje_sprite2 = pygame.image.load("jumpder2.png")
-            personaje_sprite2 = pygame.transform.scale(personaje_sprite2, (120, 150))
+            pass
         if golpe2 is True:
             personaje_sprite2 = pygame.image.load("golpe.png")
             personaje_sprite2 = pygame.transform.scale(personaje_sprite2, (160, 150))
 
     pygame.display.flip()
-    
-    #animacion caminar
-
-    # Actualizar pantalla
-    
